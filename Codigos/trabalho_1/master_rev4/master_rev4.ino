@@ -4,6 +4,19 @@
 #define ESCRAVO2 0x03
 #define FLAG 0x7E
 
+enum States {
+  FRAME1,
+  FRAME2,
+  FRAME3,
+  FRAME4,
+  CHECK1,
+  CHECK2,
+  CHECK3,
+  CHECK4,
+};
+
+States state = FRAME1;
+
 //Função para calcular o CRC do dado.
 uint16_t calculoCRC16(const uint8_t *data, size_t length) {
     uint16_t crc = 0xFFFF;
@@ -67,41 +80,61 @@ void EnviarFrame4(){
 
 void setup() {
   Serial.begin(9600);
-  delay(5000);
   
 }
 
 void loop() {
-    static uint8_t tentativas = 0;
-    static const uint8_t MAX_TENTATIVAS = 2;
+  
+  switch(state){
 
-    // Envia Frame1
-    EnviarFrame1();
-    // Aguarda resposta
-    while (Serial.available() > 0) {
-        char byte = Serial.read();
-        // Detectar início do frame
-        if (byte == FLAG) {
-            int endereco = Serial.parseInt();
-            if (endereco == MESTRE) {
-                String mensagem = Serial.readStringUntil(FLAG);
-                if (mensagem == "Erro CRC") {
-                    Serial.println("Erro CRC detectado. Tentando novamente...");
-                    tentativas++;
-                    if (tentativas < MAX_TENTATIVAS) {
-                        Serial.println("Reenviando Frame1");
-                        EnviarFrame1();
-                        delay(500);
-                    } else {
-                        Serial.println("Número máximo de tentativas alcançado. Abortando.");
-                    }
-                } else {
+    case FRAME1:
+      EnviarFrame1();
+      Serial.println();
+      delay(5000);
+      state = CHECK1;
+      break;
+      
+    case CHECK1:
+      // Aguarda resposta
+      if (Serial.available() > 0) {
+          char byte = Serial.read();
+          //Serial.println("Debug-serial");
+          
+          // Detectar início do frame
+          if (byte == FLAG) {
+            //Serial.println("Debug-FLAG");
+              int endereco = Serial.parseInt();
+              if (endereco == MESTRE) {
+                  //Serial.println("Debug-endereco");
+                  String mensagem = Serial.readStringUntil(FLAG);
+                  if (mensagem == "Erro CRC") {
+                      //Serial.println("Debug-if");
+                      Serial.println("Erro CRC detectado. Tentando novamente...");
+                      Serial.println("Reenviando Frame1");
+                      state = FRAME1;
+                      delay(4000);
+                      break;
+                  }
+                  else if (mensagem == "Mensagem válida"){
+                    //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
-                    tentativas = 0; // Reinicia o contador de tentativas
-                }
-            }
+                    delay(2500);
+                    state = FRAME2;
+                    break;
+                  }             
+              }        
         }
-    }
-    delay(6000);
-    Serial.println();
+      }
+      delay(50);
+      break;
+     
+     
+    case FRAME2:
+      EnviarFrame2();
+      delay(5000);
+      Serial.println();
+      state = FRAME1;
+      break;
+    
+  }
 }

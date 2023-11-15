@@ -59,14 +59,19 @@ void loop() {
 
                 // Verifica se os CRCs coincidem
                 if (crcCalculado == crcRecebido) {
-                    Serial.println("Mensagem válida");
-                    Serial.print("Mensagem do Mestre: ");
-                    Serial.println(mensagemRecebida);
+                    Serial.write(FLAG);
+                    Serial.print(MESTRE);
+                    Serial.print("Mensagem válida");
+                    Serial.write(FLAG);
+                    Serial.println();
+                    delay(2000);
                 } else {
-                    Serial.write(0x7E);
+                    Serial.write(FLAG);
                     Serial.print(MESTRE);
                     Serial.write("Erro CRC");
-                    Serial.write(0x7E);
+                    Serial.write(FLAG);
+                    Serial.println();
+                    delay(2000);
                 }
             } 
 
