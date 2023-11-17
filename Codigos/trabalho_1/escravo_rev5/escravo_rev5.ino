@@ -3,21 +3,18 @@
 #define ESCRAVO2 0x03
 #define FLAG 0x7E
 
-uint8_t stringToUint(const String& str) {
-    // Converte a string para um número inteiro
-    int intValue = str.toInt();
-    return intValue;
-}
-
+//Função para calcular o CRC
 uint16_t calculoCRC16(const uint8_t *data, size_t length) {
-    uint16_t crc = 0xFFFF;
+    uint16_t crc = 0xFFFF; //valor de inicio do CRC
 
+    //Percorre cada byte
     for (size_t i = 0; i < length; i++) {
-        crc ^= (uint16_t)data[i] << 8;
+        crc ^= (uint16_t)data[i] << 8; //XOR entre o CRC e o dado deslocado 8 bits
 
+        //Percorre cada bit do byte
         for (int j = 0; j < 8; j++) {
-            if (crc & 0x8000) {
-                crc = (crc << 1) ^ 0x1021;
+            if (crc & 0x8000) { //Verifica se o bit mais significativo (15) é igual a 1
+                crc = (crc << 1) ^ 0x1021; //XOR do crc deslocado 1 bit com o Polinômio gerador
             } else {
                 crc <<= 1;
             }
@@ -40,7 +37,7 @@ void loop() {
             int endereco = mensagemRecebida.toInt();
 
             if (endereco == ESCRAVO1) {
-                // Remove os últimos 5 caracteres para obter o CRC recebido
+                // Pega os últimos 5 caracteres para obter o CRC recebido
                 String crcRecebidoStr = mensagemRecebida.substring(mensagemRecebida.length() - 5);
                 uint16_t crcRecebido = crcRecebidoStr.toInt();
 
@@ -63,7 +60,7 @@ void loop() {
                     Serial.print(MESTRE);
                     Serial.print("Mensagem válida");
                     Serial.write(FLAG);
-                    Serial.print(" - Mensagem: ");
+                    Serial.print("Mensagem: ");
                     Serial.println(mensagemRecebida);
                     delay(2000);
                 } else {

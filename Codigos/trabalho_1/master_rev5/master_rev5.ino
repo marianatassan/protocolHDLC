@@ -1,9 +1,10 @@
-//DEFININDO ENDEREÇO
+//DEFINE OS ENDEREÇO E FLAG
 #define MESTRE 0x01
 #define ESCRAVO1 0x02
 #define ESCRAVO2 0x03
 #define FLAG 0x7E
 
+//DEFINE OS ESTADOS
 enum States {
   FRAME1,
   FRAME2,
@@ -15,18 +16,21 @@ enum States {
   CHECK4,
 };
 
+//ESTADO INICIAL
 States state = FRAME1;
 
-//Função para calcular o CRC do dado.
+//Função para calcular o CRC
 uint16_t calculoCRC16(const uint8_t *data, size_t length) {
-    uint16_t crc = 0xFFFF;
+    uint16_t crc = 0xFFFF; //valor de inicio do CRC
 
+    //Percorre cada byte
     for (size_t i = 0; i < length; i++) {
-        crc ^= (uint16_t)data[i] << 8;
+        crc ^= (uint16_t)data[i] << 8; //XOR entre o CRC e o dado deslocado 8 bits
 
+        //Percorre cada bit do byte
         for (int j = 0; j < 8; j++) {
-            if (crc & 0x8000) {
-                crc = (crc << 1) ^ 0x1021;
+            if (crc & 0x8000) { //Verifica se o bit mais significativo (15) é igual a 1
+                crc = (crc << 1) ^ 0x1021; //XOR do crc deslocado 1 bit com o Polinômio gerador
             } else {
                 crc <<= 1;
             }
@@ -51,7 +55,7 @@ void EnviarFrame1(){
     uint8_t frame1[] = {0x4f, 0x6c, 0x61, 0x20, 0x45, 0x73, 0x63, 0x72,  0x61, 0x76, 0x6f, 0x31};
     size_t dataLength1 = sizeof(frame1);
     uint16_t crc1 = calculoCRC16(frame1, dataLength1);
-    EnviarMensagem(ESCRAVO1, frame1, dataLength1, crc1);
+    EnviarMensagem(ESCRAVO1, frame1, dataLength1, crc1); 
 }
 
 // FRAME 2 - ESCRAVO 1
