@@ -10,10 +10,18 @@ enum States {
   FRAME2,
   FRAME3,
   FRAME4,
+  SLAVE1,
+  SLAVE2,
+  SLAVE12,
+  SLAVE22,
+  COMUNICA,
+  COMUNICA2,
   CHECK1,
   CHECK2,
   CHECK3,
   CHECK4,
+  CHECK5,
+  CHECK6,
 };
 
 //ESTADO INICIAL
@@ -82,6 +90,38 @@ void EnviarFrame4(){
   EnviarMensagem(ESCRAVO2, frame4, dataLength4, crc4);
 }
 
+// FRAME 5 - PERGUNTA ESCRAVO 1
+void EnviarFrame5(){
+  uint8_t frame5[] = {0x45,0x73,0x63,0x72,0x61,0x76,0x6F,0x20,0x32};
+  size_t dataLength5 = sizeof(frame5);
+  uint16_t crc5 = calculoCRC16(frame5, dataLength5);
+  EnviarMensagem(ESCRAVO1, frame5, dataLength5, crc5);
+}
+
+// FRAME 6 - SOLICITA MENSAGEM S1
+void EnviarFrame6(){
+      uint8_t frame6[] = {0x4D,0x61,0x6E,0x64,0x61,0x20,0x61,0x20,0x6D,0x65,0x6E,0x73,0x61,0x67,0x65,0x6D};
+      size_t dataLength6 = sizeof(frame6);
+      uint16_t crc6 = calculoCRC16(frame6, dataLength6);
+      EnviarMensagem(ESCRAVO1, frame6, dataLength6, crc6);
+}
+
+// FRAME 7 - PERGUNTA ESCRAVO 2
+void EnviarFrame7(){
+  uint8_t frame7[] = {0x45,0x73,0x63,0x72,0x61,0x76,0x6F,0x20,0x31};
+  size_t dataLength7 = sizeof(frame7);
+  uint16_t crc7 = calculoCRC16(frame7, dataLength7);
+  EnviarMensagem(ESCRAVO2, frame7, dataLength7, crc7);
+}
+
+// FRAME 8 - SOLICITA MENSAGEM S2
+void EnviarFrame8(){
+      uint8_t frame8[] = {0x4D,0x61,0x6E,0x64,0x61,0x20,0x61,0x20,0x6D,0x65,0x6E,0x73,0x61,0x67,0x65,0x6D};
+      size_t dataLength8 = sizeof(frame8);
+      uint16_t crc8 = calculoCRC16(frame8, dataLength8);
+      EnviarMensagem(ESCRAVO2, frame8, dataLength8, crc8);
+}
+
 void setup() {
   Serial.begin(9600);
   
@@ -104,21 +144,21 @@ void loop() {
           
           // Detectar início do frame
           if (flag == FLAG) {
-            Serial.println("Debug-FLAG");
+            //Serial.println("Debug-FLAG");
               int endereco = Serial.parseInt();
               if (endereco == MESTRE) {
-                  Serial.println("Debug-endereco");
+                  //Serial.println("Debug-endereco");
                   String mensagem = Serial.readStringUntil(FLAG);
                   if (mensagem == "Erro CRC") {
-                      Serial.println("Debug-if");
+                      //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
-                      Serial.println("Reenviando Frame1");
+                      Serial.println("Reenviando Frame");
                       state = FRAME1;
                       delay(4000);
                       break;
                   }
                   else if (mensagem == "Mensagem válida"){
-                    Serial.println("Debug-elseif");
+                    //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
                     state = FRAME2;
@@ -145,24 +185,24 @@ void loop() {
           
           // Detectar início do frame
           if (flag == FLAG) {
-            Serial.println("Debug-FLAG");
+            //Serial.println("Debug-FLAG");
               int endereco = Serial.parseInt();
               if (endereco == MESTRE) {
-                  Serial.println("Debug-endereco");
+                 // Serial.println("Debug-endereco");
                   String mensagem = Serial.readStringUntil(FLAG);
                   if (mensagem == "Erro CRC") {
-                      Serial.println("Debug-if");
+                      //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
-                      Serial.println("Reenviando Frame1");
+                      Serial.println("Reenviando Frame");
                       state = FRAME2;
                       delay(4000);
                       break;
                   }
                   else if (mensagem == "Mensagem válida"){
-                    Serial.println("Debug-elseif");
+                    //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
-                    state = FRAME1;
+                    state = FRAME3;
                     break;
                   }             
               }        
@@ -186,21 +226,21 @@ void loop() {
           
           // Detectar início do frame
           if (flag == FLAG) {
-            Serial.println("Debug-FLAG");
+            //Serial.println("Debug-FLAG");
               int endereco = Serial.parseInt();
               if (endereco == MESTRE) {
-                  Serial.println("Debug-endereco");
+                  //Serial.println("Debug-endereco");
                   String mensagem = Serial.readStringUntil(FLAG);
                   if (mensagem == "Erro CRC") {
-                      Serial.println("Debug-if");
+                      //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
-                      Serial.println("Reenviando Frame1");
+                      Serial.println("Reenviando Frame");
                       state = FRAME3;
                       delay(4000);
                       break;
                   }
                   else if (mensagem == "Mensagem válida"){
-                    Serial.println("Debug-elseif");
+                    //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
                     state = FRAME4;
@@ -227,15 +267,15 @@ void loop() {
           
           // Detectar início do frame
           if (flag == FLAG) {
-            Serial.println("Debug-FLAG");
+            //Serial.println("Debug-FLAG");
               int endereco = Serial.parseInt();
               if (endereco == MESTRE) {
-                 Serial.println("Debug-endereco");
+                 //Serial.println("Debug-endereco");
                   String mensagem = Serial.readStringUntil(FLAG);
                   if (mensagem == "Erro CRC") {
-                      Serial.println("Debug-if");
+                      //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
-                      Serial.println("Reenviando Frame1");
+                      Serial.println("Reenviando Frame");
                       state = FRAME4;
                       delay(4000);
                       break;
@@ -244,9 +284,191 @@ void loop() {
                     Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
-                    state = FRAME1;
+                    state = SLAVE1;
                     break;
                   }             
+              }        
+        }
+      }
+      delay(50);
+      break;
+
+    case SLAVE1:
+      EnviarFrame5();
+      Serial.println();
+      delay(5000);
+      state = CHECK5;
+      break;
+      
+    case CHECK5:
+      // Aguarda resposta
+      if (Serial.available() > 0) {
+          char flag = Serial.read();
+          //Serial.println("Debug-serial");
+          
+          // Detectar início do frame
+          if (flag == FLAG) {
+            //Serial.println("Debug-FLAG");
+              int endereco = Serial.parseInt();
+              if (endereco == MESTRE) {
+                 //Serial.println("Debug-endereco");
+                  String mensagem = Serial.readStringUntil(FLAG);
+                  if (mensagem == "Erro CRC") {
+                      //Serial.println("Debug-if");
+                      Serial.println("Erro CRC detectado. Tentando novamente...");
+                      Serial.println("Reenviando Frame");
+                      state = SLAVE1;
+                      delay(4000);
+                      break;
+                  }
+                  else if (mensagem == "sim"){
+                    //Serial.println("Debug-elseif");
+                    Serial.println("Resposta recebida com sucesso.");
+                    delay(2500);
+                    state = COMUNICA;
+                    break;
+                  }
+                  else if (mensagem == "nao"){
+                    //Serial.println("Debug-elseif");
+                    Serial.println("Resposta recebida com sucesso.");
+                    delay(2500);
+                    state = FRAME1;
+                    break;
+                  }              
+              }        
+        }
+      }
+      delay(50);
+      break;
+      
+  case COMUNICA:
+      EnviarFrame6();
+      Serial.println();
+      delay(5000);
+      state = SLAVE2;
+      break;
+      
+  case SLAVE2:
+      // Aguarda resposta
+      if (Serial.available() > 0) {
+          char flag = Serial.read();
+          //Serial.println("Debug-serial");
+          
+          // Detectar início do frame
+          if (flag == FLAG) {
+            //Serial.println("Debug-FLAG");
+              int endereco = Serial.parseInt();
+              if (endereco == MESTRE) {
+                 //Serial.println("Debug-endereco");
+                  String mensagem = Serial.readStringUntil(FLAG);
+                  if (mensagem == "Erro CRC") {
+                      //Serial.println("Debug-if");
+                      Serial.println("Erro CRC detectado. Tentando novamente...");
+                      Serial.println("Reenviando Frame");
+                      state = COMUNICA;
+                      delay(4000);
+                      break;
+                  }
+                  else {
+                     const char* bytes = mensagem.c_str();
+                     size_t dataLength7 = strlen(bytes);
+                     uint16_t crc7 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength7);
+                     EnviarMensagem(ESCRAVO2, bytes, dataLength7, crc7);
+                     delay(2000);
+                     state = SLAVE12;
+                     break;
+                  }           
+              }        
+        }
+      }
+      delay(50);
+      break;
+      
+    case SLAVE12:
+      EnviarFrame7();
+      Serial.println();
+      delay(5000);
+      state = CHECK6;
+      break;
+      
+    case CHECK6:
+      // Aguarda resposta
+      if (Serial.available() > 0) {
+          char flag = Serial.read();
+          //Serial.println("Debug-serial");
+          
+          // Detectar início do frame
+          if (flag == FLAG) {
+            //Serial.println("Debug-FLAG");
+              int endereco = Serial.parseInt();
+              if (endereco == MESTRE) {
+                 //Serial.println("Debug-endereco");
+                  String mensagem = Serial.readStringUntil(FLAG);
+                  if (mensagem == "Erro CRC") {
+                      //Serial.println("Debug-if");
+                      Serial.println("Erro CRC detectado. Tentando novamente...");
+                      Serial.println("Reenviando Frame");
+                      state = SLAVE12;
+                      delay(4000);
+                      break;
+                  }
+                  else if (mensagem == "sim"){
+                    //Serial.println("Debug-elseif");
+                    Serial.println("Resposta recebida com sucesso.");
+                    delay(2500);
+                    state = COMUNICA2;
+                    break;
+                  }
+                  else if (mensagem == "nao"){
+                    //Serial.println("Debug-elseif");
+                    Serial.println("Resposta recebida com sucesso.");
+                    delay(2500);
+                    state = FRAME1;
+                    break;
+                  }              
+              }        
+        }
+      }
+      delay(50);
+      break;
+      
+  case COMUNICA2:
+      EnviarFrame8();
+      Serial.println();
+      delay(5000);
+      state = SLAVE22;
+      break;
+      
+  case SLAVE22:
+      // Aguarda resposta
+      if (Serial.available() > 0) {
+          char flag = Serial.read();
+          //Serial.println("Debug-serial");
+          
+          // Detectar início do frame
+          if (flag == FLAG) {
+            //Serial.println("Debug-FLAG");
+              int endereco = Serial.parseInt();
+              if (endereco == MESTRE) {
+                 //Serial.println("Debug-endereco");
+                  String mensagem = Serial.readStringUntil(FLAG);
+                  if (mensagem == "Erro CRC") {
+                      //Serial.println("Debug-if");
+                      Serial.println("Erro CRC detectado. Tentando novamente...");
+                      Serial.println("Reenviando Frame");
+                      state = COMUNICA;
+                      delay(4000);
+                      break;
+                  }
+                  else {
+                     const char* bytes = mensagem.c_str();
+                     size_t dataLength7 = strlen(bytes);
+                     uint16_t crc7 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength7);
+                     EnviarMensagem(ESCRAVO2, bytes, dataLength7, crc7);
+                     delay(2000);
+                     state = FRAME1 ;
+                     break;
+                  }           
               }        
         }
       }

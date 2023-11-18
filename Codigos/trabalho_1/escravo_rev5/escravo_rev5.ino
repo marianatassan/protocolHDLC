@@ -56,13 +56,33 @@ void loop() {
 
                 // Verifica se os CRCs coincidem
                 if (crcCalculado == crcRecebido) {
-                    Serial.write(FLAG);
-                    Serial.print(MESTRE);
-                    Serial.print("Mensagem válida");
-                    Serial.write(FLAG);
-                    Serial.print("Mensagem: ");
-                    Serial.println(mensagemRecebida);
-                    delay(2000);
+                  if(mensagemRecebida == "Escravo 2"){
+                      Serial.write(FLAG);
+                      Serial.print(MESTRE);
+                      Serial.print("sim");
+                      Serial.write(FLAG);
+                      Serial.print(" Mensagem: ");
+                      Serial.println(mensagemRecebida);
+                      delay(2000);
+                  }
+                  else if(mensagemRecebida == "Manda a mensagem"){
+                      Serial.write(FLAG);
+                      Serial.print(MESTRE);
+                      Serial.print("Olá escravo 2 - S1");
+                      Serial.write(FLAG);
+                      Serial.print(" Mensagem: ");
+                      Serial.println(mensagemRecebida);
+                      delay(2000);
+                  }
+                  else{
+                      Serial.write(FLAG);
+                      Serial.print(MESTRE);
+                      Serial.print("Mensagem válida");
+                      Serial.write(FLAG);
+                      Serial.print(" Mensagem: ");
+                      Serial.println(mensagemRecebida);
+                      delay(2000);
+                  }
                 } else {
                     Serial.write(FLAG);
                     Serial.print(MESTRE);
