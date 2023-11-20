@@ -10,10 +10,10 @@ enum States {
   FRAME2,
   FRAME3,
   FRAME4,
+  PERGUNTA1,
+  PERGUNTA2,
   SLAVE1,
   SLAVE2,
-  SLAVE12,
-  SLAVE22,
   COMUNICA,
   COMUNICA2,
   CHECK1,
@@ -281,10 +281,10 @@ void loop() {
                       break;
                   }
                   else if (mensagem == "Mensagem válida"){
-                    Serial.println("Debug-elseif");
+                    //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
-                    state = SLAVE1;
+                    state = PERGUNTA1;
                     break;
                   }             
               }        
@@ -293,7 +293,7 @@ void loop() {
       delay(50);
       break;
 
-    case SLAVE1:
+    case PERGUNTA1:
       EnviarFrame5();
       Serial.println();
       delay(5000);
@@ -317,7 +317,7 @@ void loop() {
                       //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
                       Serial.println("Reenviando Frame");
-                      state = SLAVE1;
+                      state = PERGUNTA1;
                       delay(4000);
                       break;
                   }
@@ -332,7 +332,7 @@ void loop() {
                     //Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
-                    state = FRAME1;
+                    state = PERGUNTA2;
                     break;
                   }              
               }        
@@ -341,14 +341,14 @@ void loop() {
       delay(50);
       break;
       
-  case COMUNICA:
+    case COMUNICA:
       EnviarFrame6();
       Serial.println();
       delay(5000);
-      state = SLAVE2;
+      state = SLAVE1;
       break;
       
-  case SLAVE2:
+    case SLAVE1:
       // Aguarda resposta
       if (Serial.available() > 0) {
           char flag = Serial.read();
@@ -371,11 +371,12 @@ void loop() {
                   }
                   else {
                      const char* bytes = mensagem.c_str();
-                     size_t dataLength7 = strlen(bytes);
-                     uint16_t crc7 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength7);
-                     EnviarMensagem(ESCRAVO2, bytes, dataLength7, crc7);
+                     size_t dataLength9 = strlen(bytes);
+                     uint16_t crc9 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength9);
+                     EnviarMensagem(ESCRAVO2, bytes, dataLength9, crc9);
                      delay(2000);
-                     state = SLAVE12;
+                     Serial.println();
+                     state = PERGUNTA2;
                      break;
                   }           
               }        
@@ -384,12 +385,12 @@ void loop() {
       delay(50);
       break;
       
-    case SLAVE12:
+    case PERGUNTA2:
       EnviarFrame7();
       Serial.println();
       delay(5000);
       state = CHECK6;
-      break;
+      break;;
       
     case CHECK6:
       // Aguarda resposta
@@ -399,31 +400,32 @@ void loop() {
           
           // Detectar início do frame
           if (flag == FLAG) {
-            //Serial.println("Debug-FLAG");
+            Serial.println("Debug-FLAG");
               int endereco = Serial.parseInt();
               if (endereco == MESTRE) {
-                 //Serial.println("Debug-endereco");
-                  String mensagem = Serial.readStringUntil(FLAG);
-                  if (mensagem == "Erro CRC") {
-                      //Serial.println("Debug-if");
+                 Serial.println("Debug-endereco");
+                 String mensagem1 = Serial.readStringUntil(FLAG);
+                 Serial.println(mensagem1);
+                 if (mensagem1 == "Erro CRC") {
+                      Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
                       Serial.println("Reenviando Frame");
-                      state = SLAVE12;
+                      state = PERGUNTA2;
                       delay(4000);
                       break;
                   }
-                  else if (mensagem == "sim"){
-                    //Serial.println("Debug-elseif");
-                    Serial.println("Resposta recebida com sucesso.");
-                    delay(2500);
-                    state = COMUNICA2;
-                    break;
-                  }
-                  else if (mensagem == "nao"){
-                    //Serial.println("Debug-elseif");
+                  else if (mensagem1 == "nao"){
+                    Serial.println("Debug-elseif");
                     Serial.println("Resposta recebida com sucesso.");
                     delay(2500);
                     state = FRAME1;
+                    break;
+                  }
+                  else{
+                    Serial.println("Debug-elseif");
+                    Serial.println("Resposta recebida com sucesso.");
+                    delay(2500);
+                    state = COMUNICA2;
                     break;
                   }              
               }        
@@ -432,14 +434,14 @@ void loop() {
       delay(50);
       break;
       
-  case COMUNICA2:
+    case COMUNICA2:
       EnviarFrame8();
       Serial.println();
       delay(5000);
-      state = SLAVE22;
+      state = SLAVE2;
       break;
       
-  case SLAVE22:
+    case SLAVE2:
       // Aguarda resposta
       if (Serial.available() > 0) {
           char flag = Serial.read();
@@ -456,16 +458,17 @@ void loop() {
                       //Serial.println("Debug-if");
                       Serial.println("Erro CRC detectado. Tentando novamente...");
                       Serial.println("Reenviando Frame");
-                      state = COMUNICA;
+                      state = COMUNICA2;
                       delay(4000);
                       break;
                   }
                   else {
                      const char* bytes = mensagem.c_str();
-                     size_t dataLength7 = strlen(bytes);
-                     uint16_t crc7 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength7);
-                     EnviarMensagem(ESCRAVO2, bytes, dataLength7, crc7);
+                     size_t dataLength10 = strlen(bytes);
+                     uint16_t crc10 = calculoCRC16(reinterpret_cast<const uint8_t*>(bytes), dataLength10);
+                     EnviarMensagem(ESCRAVO1, bytes, dataLength10, crc10);
                      delay(2000);
+                     Serial.println();
                      state = FRAME1 ;
                      break;
                   }           

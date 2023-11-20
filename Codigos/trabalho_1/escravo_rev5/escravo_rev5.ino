@@ -61,7 +61,8 @@ void loop() {
                       Serial.print(MESTRE);
                       Serial.print("sim");
                       Serial.write(FLAG);
-                      Serial.print(" Mensagem: ");
+                      Serial.println();
+                      Serial.print(" Mensagem recebida: ");
                       Serial.println(mensagemRecebida);
                       delay(2000);
                   }
@@ -70,16 +71,18 @@ void loop() {
                       Serial.print(MESTRE);
                       Serial.print("Olá escravo 2 - S1");
                       Serial.write(FLAG);
-                      Serial.print(" Mensagem: ");
+                      Serial.println();
+                      Serial.print(" Mensagem recebida: ");
                       Serial.println(mensagemRecebida);
                       delay(2000);
                   }
-                  else{
+                  else {
                       Serial.write(FLAG);
                       Serial.print(MESTRE);
                       Serial.print("Mensagem válida");
                       Serial.write(FLAG);
-                      Serial.print(" Mensagem: ");
+                      Serial.println();
+                      Serial.print(" Mensagem recebida: ");
                       Serial.println(mensagemRecebida);
                       delay(2000);
                   }
